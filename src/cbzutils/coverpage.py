@@ -87,7 +87,6 @@ def generate_coverpage(
     )
     combined_text.paste(t1_img, (0, 0))
     combined_text.paste(t2_img, (0, t1_img.height + margin_height))
-    combined_text.save("tmp2.png")
 
     # Blur the background, draw a translucent rectangle and write the text
     img = img.filter(ImageFilter.GaussianBlur(radius=20))
@@ -98,8 +97,6 @@ def generate_coverpage(
         220,
     )
     img = _paste_center(img, combined_text)
-
-    img.save("tmp.png")
 
     return img
 
