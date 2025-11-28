@@ -1,12 +1,15 @@
-from typing import Union
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
-from .source import Source
 import tempfile
 from pathlib import Path
+from typing import Union
 
-default_font_path = Path(__file__).parent / 'fonts' / 'opensans.ttf'
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
+
+from .source import Source
+
+default_font_path = Path(__file__).parent / "fonts" / "opensans.ttf"
 
 type ColorType = Union[tuple[int, int, int, int], tuple[int, int, int], str]
+
 
 class CoverPage(Source):
     """
@@ -14,38 +17,45 @@ class CoverPage(Source):
     This is a wrapper over generate_coverpage function that can be
     directly appended to a writer object.
     """
+
     def __init__(self, title: str, subtitle: str, background: str = None):
         self.title = title
         self.subtitle = subtitle
         self.background = background
         self._tempfile = None
-    
+
     def __len__(self):
         return 1
-    
+
     def __getitem__(self, idx: int) -> Path:
         """
         Auto generates the cover when index is set to 0. Raises IndexError
         otherwise.
         """
         if idx != 0:
-            raise IndexError(f"No such page as index {idx}, Cover page only supports one page at index 0")
+            raise IndexError(
+                f"No such page as index {idx}, Cover page only supports one page at index 0"
+            )
 
         if self._tempfile is not None:
             return self._tempfile.name
-        
+
         # Generate the cover page if it does not exist
         self._tempfile = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
-        generate_coverpage(self.title, self.subtitle, self.background).save(self._tempfile, "PNG")
+        generate_coverpage(self.title, self.subtitle, self.background).save(
+            self._tempfile, "PNG"
+        )
         self._tempfile.close()
         return Path(self._tempfile.name)
-    
+
     def __del__(self):
         if self._tempfile is not None:
             Path(self._tempfile.name).unlink(missing_ok=True)
 
 
-def generate_coverpage(title: str, subtitle: str, background: str = None) -> Image.Image:
+def generate_coverpage(
+    title: str, subtitle: str, background: str = None
+) -> Image.Image:
     """
     Generates a cover page with the given background image.
     If no image is provided, takes a white background.
@@ -67,14 +77,26 @@ def generate_coverpage(title: str, subtitle: str, background: str = None) -> Ima
     if t2_img.width > text_width_max:
         t2_img = t2_img.resize(_resize_size(t2_img, text_width_max, -1))
 
-    combined_text = Image.new("RGBA", (max(t1_img.width, t2_img.width), t1_img.height + t2_img.height + margin_height), (0, 0, 0, 0))
+    combined_text = Image.new(
+        "RGBA",
+        (
+            max(t1_img.width, t2_img.width),
+            t1_img.height + t2_img.height + margin_height,
+        ),
+        (0, 0, 0, 0),
+    )
     combined_text.paste(t1_img, (0, 0))
     combined_text.paste(t2_img, (0, t1_img.height + margin_height))
     combined_text.save("tmp2.png")
 
     # Blur the background, draw a translucent rectangle and write the text
     img = img.filter(ImageFilter.GaussianBlur(radius=20))
-    img = _draw_center_rect(img, combined_text.width + 0.05 * img.width, combined_text.height + 0.05 * img.height, 220)
+    img = _draw_center_rect(
+        img,
+        combined_text.width + 0.05 * img.width,
+        combined_text.height + 0.05 * img.height,
+        220,
+    )
     img = _paste_center(img, combined_text)
 
     img.save("tmp.png")
@@ -95,8 +117,12 @@ def _resize_size(img: Image.Image, width: int, height: int) -> tuple[int, int]:
 
 
 FILL_COLOR = (0, 0, 0)
-#LLM generated
-def _draw_center_rect(img: Image.Image, width: int, height: int, opacity: int = 220) -> Image.Image:
+
+
+# LLM generated
+def _draw_center_rect(
+    img: Image.Image, width: int, height: int, opacity: int = 220
+) -> Image.Image:
     """
     Draws a semi-transparent rectangle centered on `img`.
 
@@ -113,14 +139,15 @@ def _draw_center_rect(img: Image.Image, width: int, height: int, opacity: int = 
 
     cx, cy = base.size[0] // 2, base.size[1] // 2
 
-    left   = cx - width // 2
-    top    = cy - height // 2
-    right  = cx + width // 2
+    left = cx - width // 2
+    top = cy - height // 2
+    right = cx + width // 2
     bottom = cy + height // 2
 
     draw.rectangle([left, top, right, bottom], fill=(*FILL_COLOR, opacity))
 
     return Image.alpha_composite(base, overlay)
+
 
 def _paste_center(img_base: Image.Image, img_overlay: Image.Image) -> Image.Image:
     """
@@ -162,7 +189,7 @@ def _render_text(
     w = r - l
     h = b - t
 
-    im = Image.new("RGBA", (w+10, h+10), (0, 0, 0, 0))
+    im = Image.new("RGBA", (w + 10, h + 10), (0, 0, 0, 0))
     draw = ImageDraw.Draw(im)
     draw.text((-l + 5, -t + 5), text, fill=fill, font=font)
 

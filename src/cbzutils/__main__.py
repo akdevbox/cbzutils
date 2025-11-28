@@ -4,9 +4,9 @@
 # Licensed under LGPL v3.0 (See LICENSE.txt)
 
 import argparse
+import glob
 import sys
 from pathlib import Path
-import glob
 
 import cbzutils
 
@@ -25,13 +25,15 @@ def run_app(args: list[str] = None) -> None:
         "merge", help="To merge multiple cbz files into one"
     )
     merge_opts.add_argument("files", nargs="+", help="Path to all cbz files")
-    merge_opts.add_argument("-o", "--out", metavar="FILE", help="Output file", default="output.cbz")
+    merge_opts.add_argument(
+        "-o", "--out", metavar="FILE", help="Output file", default="output.cbz"
+    )
     merge_opts.add_argument(
         "-s",
         "--sort-key",
         help="Sort key to sort names, by default uses a smart name num sort",
         choices=cbzutils.sort_keys.KEY_DICT.keys(),
-        default="namenum"
+        default="namenum",
     )
     merge_opts.add_argument(
         "-d",
@@ -78,4 +80,11 @@ def cmd_merge(args: argparse.Namespace):
         for i, x in enumerate(sorted(infiles_expanded, key=sort_key_fn)):
             print(f"({i+1}/{len(infiles_expanded)}) {Path(x).name}")
     else:
-        cbzutils.merge_cbz(outfile, infiles_expanded, sort_key_fn, not args.no_cover, args.title, args.subtitle)
+        cbzutils.merge_cbz(
+            outfile,
+            infiles_expanded,
+            sort_key_fn,
+            not args.no_cover,
+            args.title,
+            args.subtitle,
+        )

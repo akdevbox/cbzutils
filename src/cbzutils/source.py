@@ -4,6 +4,7 @@ import tempfile
 import zipfile
 from pathlib import Path
 
+
 class Source(abc.ABC):
     """
     Source abstract class
@@ -14,6 +15,7 @@ class Source(abc.ABC):
     * `len(object)` should return the total number of pages in the source.
     * an IndexError is raised when index is out of range of the source.
     """
+
     def __len__(self) -> int:
         pass
 
@@ -32,6 +34,7 @@ class CbzSource(Source):
     Upon deletion, automatically deletes any created temp files.
     Hence, tempfile paths returned by this object are only valid as long as the object is alive.
     """
+
     def __init__(self, fname: Path) -> None:
         self._fname = fname
         self._fhandle = zipfile.ZipFile(fname)
@@ -76,7 +79,7 @@ class CbzSource(Source):
     def __del__(self) -> None:
         self._fhandle.close()
 
-        # Cleanup all temporary files that have been created     
+        # Cleanup all temporary files that have been created
         for x in self._extracted_tempfiles:
             if x is not None:
                 Path(x).unlink(missing_ok=True)

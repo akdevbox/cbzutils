@@ -3,17 +3,22 @@
 # Copyright (c) 2025 Amaan
 # Licensed under LGPL v3.0 (See LICENSE.txt)
 
-import tqdm
-
-from . import sort_keys, source
-from . import writer
-from . import coverpage
-
-
 from pathlib import Path
 from typing import Any, Callable
 
-def merge_cbz(output: Path, files: list[Path], sort_key: Callable[[str], Any] = sort_keys.key_default, add_cover: bool = True, title: str = None, subtitle: str = None):
+import tqdm
+
+from . import coverpage, sort_keys, source, writer
+
+
+def merge_cbz(
+    output: Path,
+    files: list[Path],
+    sort_key: Callable[[str], Any] = sort_keys.key_default,
+    add_cover: bool = True,
+    title: str = None,
+    subtitle: str = None,
+):
     """
     Merges as bunch of input cbz files into an output cbz file.
 
@@ -46,5 +51,5 @@ def merge_cbz(output: Path, files: list[Path], sort_key: Callable[[str], Any] = 
 
     for x in tqdm.tqdm(sources, "Merging files"):
         cbzwriter.append_source(x)
-    
+
     cbzwriter.close()

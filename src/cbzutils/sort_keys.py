@@ -2,6 +2,7 @@ import string
 from functools import cmp_to_key
 from typing import Union
 
+
 def key_default(x: str) -> str:
     """
     Default key does not perform any conversions on the input type
@@ -35,8 +36,8 @@ def _split_into_str_num_components(x: str) -> list[Union[float, str]]:
             else:
                 buffer += letter
         elif mode == "i":
-            if letter in string.digits or (letter == '.' and not encounter_float):
-                if letter == '.':
+            if letter in string.digits or (letter == "." and not encounter_float):
+                if letter == ".":
                     encounter_float = True
                 buffer += letter
             else:
@@ -44,7 +45,6 @@ def _split_into_str_num_components(x: str) -> list[Union[float, str]]:
                 buffer = letter
                 mode = "s"
                 encounter_float = False
-
 
     # For if there is content remaining in the buffer
     if buffer:
@@ -67,7 +67,6 @@ def _cmp_namenum(x1: str, x2: str) -> int:
         x1 = x1.removesuffix(".cbz")
     if x2.endswith(".cbz"):
         x2 = x2.removesuffix(".cbz")
-
 
     # First split into respective components of str and int so we can compare them one by one
     x1 = _split_into_str_num_components(x1)

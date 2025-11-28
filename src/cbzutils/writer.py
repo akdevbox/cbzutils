@@ -1,7 +1,7 @@
 import abc
-from pathlib import Path
 import shutil
 import zipfile
+from pathlib import Path
 
 from .source import Source
 
@@ -12,7 +12,7 @@ class Writer(abc.ABC):
         Appends a source into the writer.
         """
         pass
-    
+
     def close(self) -> None:
         """
         Performs all the necessary cleanup to close and complete
@@ -36,9 +36,9 @@ class CbzWriter(Writer):
             source_file_path = src[x]
 
             ext = source_file_path.suffix
-            
-            srcfile = open(source_file_path, 'rb')
-            destfile = self._fhandle.open(f"{self._counter:06d}{ext}", 'w')
+
+            srcfile = open(source_file_path, "rb")
+            destfile = self._fhandle.open(f"{self._counter:06d}{ext}", "w")
             shutil.copyfileobj(srcfile, destfile)
 
             srcfile.close()

@@ -8,6 +8,7 @@ def test_numname_sep():
     assert fn("00123") == ["", 123.0]
     assert fn("134rf123qq") == ["", 134.0, "rf", 123.0, "qq"]
 
+
 def test_namenum_sort():
     fn = cbzutils.sort_keys.key_namenum
 
@@ -34,5 +35,3 @@ def test_namenum_sort():
     ]
 
     assert t2 == list(sorted(t2, key=fn))
-
-    
