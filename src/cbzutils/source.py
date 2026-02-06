@@ -1,9 +1,11 @@
 import abc
+import copy
 import io
 import shutil
 import tempfile
 import zipfile
 from pathlib import Path
+from typing import Self
 
 
 class Source(abc.ABC):
@@ -87,3 +89,49 @@ class CbzSource(Source):
         for x in self._extracted_tempfiles:
             if x is not None:
                 Path(x).unlink(missing_ok=True)
+
+
+class CombinedSource(Source):
+    """
+    Combines the given sources to act like one. Essentially a merger without having marged
+    yet.
+    """
+
+    def __init__(self, sources: list[Source]):
+        self._sources = sources
+        self._lens = [len(x) for x in self._sources]
+        self._len = sum(self._lens)
+
+    def __len__(self) -> int:
+        return self._len
+
+    def __getitem__(self, idx: int) -> Path:
+        for i, ln in enumerate(self._lens):
+            if idx - ln < 0:
+                return self._sources[i][idx]
+
+        raise IndexError("Index not in range of the combined sources")
+
+
+class SourceSlice(Source):
+    """
+    Creates a slice out of the original source
+    """
+
+    def __init__(self, source: Source, start_idx: int, end_idx: int):
+        self._start = start_idx
+        self._end = end_idx
+        self.source = source
+
+        assert (
+            self._end >= self._start
+        ), "The slice end_idx must be greated than start_idx"
+
+    def __len__(self) -> int:
+        return self._end - self._start
+
+    def __getitem__(self, idx: int) -> Path:
+        if idx >= len(self) or idx < 0:
+            raise IndexError(f"index larger than slice length of: {len(self)}")
+
+        return self.source[self._start + idx]

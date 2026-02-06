@@ -2,11 +2,12 @@
 #
 # Copyright (c) 2025 Amaan
 # Licensed under LGPL v3.0 (See LICENSE.txt)
-
 from pathlib import Path
 from typing import Any, Callable
 
 import tqdm
+
+from cbzutils.options import CommonOptions
 
 from . import coverpage, sort_keys, source, writer
 
@@ -14,10 +15,7 @@ from . import coverpage, sort_keys, source, writer
 def merge_cbz(
     output: Path,
     files: list[Path],
-    sort_key: Callable[[str], Any] = sort_keys.key_default,
-    add_cover: bool = True,
-    title: str | None = None,
-    subtitle: str | None = None,
+    options: CommonOptions | None = None,
 ):
     """
     Merges as bunch of input cbz files into an output cbz file.
@@ -26,15 +24,15 @@ def merge_cbz(
     to the list.sort method.
     """
 
+    if options is None:
+        options = CommonOptions()
+
+    options.with_fn(output)
+
     files = [Path(x) for x in files]  # Just to make sure
 
     cbzwriter = writer.CbzWriter(Path(output))
-    files.sort(key=lambda x: sort_key(x.name))
-
-    if title is None:
-        title = output.name.removesuffix(".cbz")
-    if subtitle is None:
-        subtitle = ""
+    files.sort(key=lambda x: options.sort_key(x.name))
 
     sources = [source.CbzSource(x) for x in files]
     cover_background: str | None
@@ -46,8 +44,8 @@ def merge_cbz(
     else:
         cover_background = None
 
-    if add_cover:
-        cover = coverpage.CoverPage(title, subtitle, cover_background)
+    if options.add_cover:
+        cover = coverpage.CoverPage(options.title, options.subtitle, cover_background)
         cbzwriter.append_source(cover)
 
     for x in tqdm.tqdm(sources, "Merging files"):

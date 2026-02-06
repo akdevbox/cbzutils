@@ -2,13 +2,13 @@
 #
 # Copyright (c) 2025 Amaan
 # Licensed under LGPL v3.0 (See LICENSE.txt)
-
 import argparse
 import glob
 import sys
 from pathlib import Path
 
 import cbzutils
+from cbzutils.options import CommonOptions
 
 
 def run_app(args: list[str] | None = None) -> None:
@@ -50,13 +50,13 @@ def run_app(args: list[str] | None = None) -> None:
         "-t",
         "--title",
         help="The title of the file for the cover, defaults to output file name",
-        default=None,
+        default="",
     )
     merge_opts.add_argument(
         "-T",
         "--subtitle",
         help="The subtitle of the file for the cover, defaults to empty string",
-        default=None,
+        default="",
     )
 
     args_parsed = parser.parse_args(args=args)
@@ -80,11 +80,7 @@ def cmd_merge(args: argparse.Namespace):
         for i, x in enumerate(sorted(infiles_expanded, key=sort_key_fn)):
             print(f"({i+1}/{len(infiles_expanded)}) {Path(x).name}")
     else:
-        cbzutils.merge_cbz(
-            outfile,
-            infiles_expanded,
-            sort_key_fn,
-            not args.no_cover,
-            args.title,
-            args.subtitle,
+        options = CommonOptions(
+            not args.no_cover, args.title, args.subtitle, sort_key_fn
         )
+        cbzutils.merge_cbz(outfile, infiles_expanded, options)
