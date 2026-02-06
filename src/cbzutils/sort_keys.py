@@ -69,20 +69,20 @@ def _cmp_namenum(x1: str, x2: str) -> int:
         x2 = x2.removesuffix(".cbz")
 
     # First split into respective components of str and int so we can compare them one by one
-    x1 = _split_into_str_num_components(x1)
-    x2 = _split_into_str_num_components(x2)
+    x1_list = _split_into_str_num_components(x1)
+    x2_list = _split_into_str_num_components(x2)
 
-    min_len = min(len(x1), len(x2))
+    min_len = min(len(x1_list), len(x2_list))
 
     for idx in range(min_len):
-        if x1[idx] < x2[idx]:
+        if x1_list[idx] < x2_list[idx]:  # ty:ignore[unsupported-operator]
             return -1
-        elif x1[idx] > x2[idx]:
+        elif x1_list[idx] > x2_list[idx]:  # ty:ignore[unsupported-operator]
             return 1
 
-    if len(x1) < len(x2):
+    if len(x1_list) < len(x2_list):
         return -1
-    elif len(x1) > len(x2):
+    elif len(x1_list) > len(x2_list):
         return 1
     else:
         return 0

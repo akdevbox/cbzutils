@@ -16,8 +16,8 @@ def merge_cbz(
     files: list[Path],
     sort_key: Callable[[str], Any] = sort_keys.key_default,
     add_cover: bool = True,
-    title: str = None,
-    subtitle: str = None,
+    title: str | None = None,
+    subtitle: str | None = None,
 ):
     """
     Merges as bunch of input cbz files into an output cbz file.
@@ -37,9 +37,10 @@ def merge_cbz(
         subtitle = ""
 
     sources = [source.CbzSource(x) for x in files]
+    cover_background: str | None
     if sources:
         if len(sources[0]):
-            cover_background = sources[0][0]
+            cover_background = str(sources[0][0])
         else:
             cover_background = None
     else:

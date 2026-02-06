@@ -18,7 +18,7 @@ class CoverPage(Source):
     directly appended to a writer object.
     """
 
-    def __init__(self, title: str, subtitle: str, background: str = None):
+    def __init__(self, title: str, subtitle: str, background: str | None = None):
         self.title = title
         self.subtitle = subtitle
         self.background = background
@@ -38,7 +38,7 @@ class CoverPage(Source):
             )
 
         if self._tempfile is not None:
-            return self._tempfile.name
+            return Path(self._tempfile.name)
 
         # Generate the cover page if it does not exist
         self._tempfile = tempfile.NamedTemporaryFile(suffix=".png", delete=False)
@@ -54,7 +54,7 @@ class CoverPage(Source):
 
 
 def generate_coverpage(
-    title: str, subtitle: str, background: str = None
+    title: str, subtitle: str, background: str | Path | None = None
 ) -> Image.Image:
     """
     Generates a cover page with the given background image.
@@ -118,7 +118,7 @@ FILL_COLOR = (0, 0, 0)
 
 # LLM generated
 def _draw_center_rect(
-    img: Image.Image, width: int, height: int, opacity: int = 220
+    img: Image.Image, width: int | float, height: int | float, opacity: int = 220
 ) -> Image.Image:
     """
     Draws a semi-transparent rectangle centered on `img`.
@@ -186,7 +186,7 @@ def _render_text(
     w = r - l
     h = b - t
 
-    im = Image.new("RGBA", (w + 10, h + 10), (0, 0, 0, 0))
+    im = Image.new("RGBA", (int(w) + 10, int(h) + 10), (0, 0, 0, 0))
     draw = ImageDraw.Draw(im)
     draw.text((-l + 5, -t + 5), text, fill=fill, font=font)
 

@@ -1,4 +1,5 @@
 import abc
+import io
 import shutil
 import tempfile
 import zipfile
@@ -16,14 +17,15 @@ class Source(abc.ABC):
     * an IndexError is raised when index is out of range of the source.
     """
 
-    def __len__(self) -> int:
-        pass
+    @abc.abstractmethod
+    def __len__(self) -> int: ...
 
+    @abc.abstractmethod
     def __getitem__(self, idx: int) -> Path:
         """
         Should return a path to an image file.
         """
-        pass
+        ...
 
 
 class CbzSource(Source):
@@ -45,7 +47,9 @@ class CbzSource(Source):
         # Create a list either containing None or containing the tempfile path to the
         # respective page/index in the cbz file. the tempfile is created if not found
         # inside __getitem__ method.
-        self._extracted_tempfiles = [None for x in range(len(self._internal_fnames))]
+        self._extracted_tempfiles: list[str] = [
+            None for x in range(len(self._internal_fnames))
+        ]
 
     def __len__(self) -> int:
         return len(self._internal_fnames)

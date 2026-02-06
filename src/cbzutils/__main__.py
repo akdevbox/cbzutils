@@ -11,7 +11,7 @@ from pathlib import Path
 import cbzutils
 
 
-def run_app(args: list[str] = None) -> None:
+def run_app(args: list[str] | None = None) -> None:
     if args is None:
         args = sys.argv[1:]
 
@@ -59,10 +59,10 @@ def run_app(args: list[str] = None) -> None:
         default=None,
     )
 
-    args = parser.parse_args(args=args)
+    args_parsed = parser.parse_args(args=args)
 
-    if args._cmd == "merge":
-        cmd_merge(args)
+    if args_parsed._cmd == "merge":
+        cmd_merge(args_parsed)
 
 
 def cmd_merge(args: argparse.Namespace):
